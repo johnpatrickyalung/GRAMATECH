@@ -1,18 +1,12 @@
 import { useState } from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function AdminLayout() {
   const { user, logout } = useAuth()
-  const navigate = useNavigate()
   const [sideOpen, setSideOpen] = useState(false)
 
   const close = () => setSideOpen(false)
-
-  const handleNav = (to: string) => {
-    close()
-    navigate(to)
-  }
 
   return (
     <div className="admin-shell">

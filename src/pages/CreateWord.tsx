@@ -22,7 +22,7 @@ export default function CreateWord() {
   const [category, setCategory] = useState<Category | null>(null)
   const [form, setForm] = useState<WordFormFields>(emptyForm())
   const [audioFile, setAudioFile] = useState<File | null>(null)
-  const [audioKey, setAudioKey] = useState(0)
+  const [audioKey] = useState(0)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
