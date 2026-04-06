@@ -8,6 +8,7 @@
     "server": "node server/index.js",
     "db:seed-admin": "node server/seedAdmin.js",
     "dev:full": "concurrently -k \"npm run server\" \"npm run dev\"",
+    "build": "echo Backend-only deploy — no frontend build needed",
     "build:frontend": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
