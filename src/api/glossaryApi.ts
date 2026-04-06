@@ -104,8 +104,36 @@ export async function createWord(
   return parseWord(data)
 }
 
-export async function deleteWord(wordId: string): Promise<void> {
-  await jsonFetch(`/api/words/${encodeURIComponent(wordId)}`, { method: 'DELETE' })
+export async function deleteWord(categoryId: string, wordId: string): Promise<void> {
+  await jsonFetch(`/api/categories/${encodeURIComponent(categoryId)}/words/${encodeURIComponent(wordId)}`, { method: 'DELETE' })
+}
+
+export async function updateWord(
+  categoryId: string,
+  wordId: string,
+  fields: WordFormFields,
+  audioFile?: File | null,
+  deleteAudio?: boolean,
+): Promise<GlossaryWord> {
+  const fd = new FormData()
+  fd.append('term', fields.term)
+  fd.append('definition', fields.definition)
+  fd.append('paraanNgPagbigkas', fields.paraanNgPagbigkas)
+  fd.append('bahagiNgPananalita', fields.bahagiNgPananalita)
+  fd.append('kahulugangPangGramatika', fields.kahulugangPangGramatika)
+  fd.append('salinSaIloko', fields.salinSaIloko)
+  fd.append('salinSaKapampangan', fields.salinSaKapampangan)
+  fd.append('halimbawaPangungusap', fields.halimbawaPangungusap)
+  if (audioFile) fd.append('audio', audioFile)
+  if (deleteAudio) fd.append('deleteAudio', 'true')
+
+  const r = await fetch(
+    `${base}/api/categories/${encodeURIComponent(categoryId)}/words/${encodeURIComponent(wordId)}`,
+    { method: 'PATCH', credentials: 'include', body: fd },
+  )
+  const data = (await r.json().catch(() => ({}))) as Record<string, unknown> & { error?: string }
+  if (!r.ok) throw new Error(typeof data.error === 'string' ? data.error : r.statusText)
+  return parseWord(data)
 }
 
 export type AuthUser = { username: string }
@@ -120,14 +148,20 @@ export type LoginResponse = {
 }
 
 export async function fetchMe(): Promise<{ user: AuthUser | null }> {
-  return jsonFetch<{ user: AuthUser | null }>('/api/auth/me')
+  try {
+    const data = await jsonFetch<{ username?: string }>('/api/auth/me')
+    return { user: data.username ? { username: data.username } : null }
+  } catch {
+    return { user: null }
+  }
 }
 
 export async function login(username: string, password: string): Promise<LoginResponse> {
-  return jsonFetch<LoginResponse>('/api/auth/login', {
+  const data = await jsonFetch<{ ok: boolean; username: string }>('/api/auth/login', {
     method: 'POST',
     body: JSON.stringify({ username, password }),
   })
+  return { ok: true, user: { username: data.username }, token: '', tokenType: 'Bearer', expiresIn: '' }
 }
 
 export async function logout(): Promise<void> {

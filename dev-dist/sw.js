@@ -67,7 +67,7 @@ if (!self.define) {
     });
   };
 }
-define(['./workbox-2ae722a1'], (function (workbox) { 'use strict';
+define(['./workbox-a39fd305'], (function (workbox) { 'use strict';
 
   self.skipWaiting();
   workbox.clientsClaim();
@@ -79,11 +79,12 @@ define(['./workbox-2ae722a1'], (function (workbox) { 'use strict';
    */
   workbox.precacheAndRoute([{
     "url": "index.html",
-    "revision": "0.57e0tdnkmsg"
+    "revision": "0.hsamemb3jt8"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
-    allowlist: [/^\/$/]
+    allowlist: [/^\/$/],
+    denylist: [/^\/api\//]
   }));
   workbox.registerRoute(/^https:\/\/fonts\.googleapis\.com\/.*/i, new workbox.CacheFirst({
     "cacheName": "google-fonts-cache",
@@ -92,5 +93,7 @@ define(['./workbox-2ae722a1'], (function (workbox) { 'use strict';
       maxAgeSeconds: 31536000
     })]
   }), 'GET');
+  workbox.registerRoute(/\/api\/.*/, new workbox.NetworkOnly(), 'GET');
+  workbox.registerRoute(/\/uploads\/.*/, new workbox.NetworkOnly(), 'GET');
 
 }));

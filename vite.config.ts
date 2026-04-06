@@ -22,7 +22,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'pwa-icon.svg'],
       devOptions: {
-        enabled: true,
+        enabled: false,
       },
       manifest: {
         name: 'GRAMATECH',
@@ -43,6 +43,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,svg,png,woff2}'],
+        navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -51,6 +52,14 @@ export default defineConfig({
               cacheName: 'google-fonts-cache',
               expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
             },
+          },
+          {
+            urlPattern: /\/api\/.*/,
+            handler: 'NetworkOnly',
+          },
+          {
+            urlPattern: /\/uploads\/.*/,
+            handler: 'NetworkOnly',
           },
         ],
       },

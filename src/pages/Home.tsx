@@ -1,224 +1,215 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { fetchCategories, fetchWords } from '../api/glossaryApi'
 import { WordEntryBody } from '../components/WordEntryBody'
-import { playWordEntry } from '../playWord'
-import { speechSupported } from '../speak'
 import type { Category, GlossaryWord } from '../types'
 import '../App.css'
 
+const CATEGORY_ICONS = ['📚','🗂️','📖','🔤','🧩','💬','📝','🔍','🌐','🏷️','📌','💡','🎓','🧠','📜','✏️','🔑','📋','🗃️','⚡']
+
+function getCategoryIcon(id: string): string {
+  let hash = 0
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0
+  return CATEGORY_ICONS[hash % CATEGORY_ICONS.length]
+}
+
+type View = 'categories' | 'term-list' | 'word-detail'
+
 export default function Home() {
-  const [online, setOnline] = useState(() => navigator.onLine)
   const [categories, setCategories] = useState<Category[]>([])
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
+  const [selectedWord, setSelectedWord] = useState<GlossaryWord | null>(null)
   const [words, setWords] = useState<GlossaryWord[]>([])
+  const [wordsLoading, setWordsLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [search, setSearch] = useState('')
+  const [view, setView] = useState<View>('categories')
 
   const refreshCategories = useCallback(async () => {
     const list = await fetchCategories()
     setCategories(list)
-    setSelectedId((prev) => {
-      if (prev && list.some((c) => c.id === prev)) return prev
-      return list[0]?.id ?? null
-    })
   }, [])
 
-  const handleRefresh = useCallback(() => {
-    void (async () => {
-      setError(null)
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
       setLoading(true)
-      try {
-        await refreshCategories()
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Failed to load data')
-      } finally {
-        setLoading(false)
-      }
+      setError(null)
+      try { await refreshCategories() }
+      catch (e) { if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load') }
+      finally { if (!cancelled) setLoading(false) }
     })()
+    return () => { cancelled = true }
   }, [refreshCategories])
 
   useEffect(() => {
-    const on = () => setOnline(true)
-    const off = () => setOnline(false)
-    window.addEventListener('online', on)
-    window.addEventListener('offline', off)
-    return () => {
-      window.removeEventListener('online', on)
-      window.removeEventListener('offline', off)
-    }
-  }, [])
-
-  useEffect(() => {
     const onVisible = () => {
-      if (document.visibilityState === 'visible') {
-        void refreshCategories().catch(() => {
-          /* keep list */
-        })
-      }
+      if (document.visibilityState === 'visible') void refreshCategories().catch(() => {})
     }
     document.addEventListener('visibilitychange', onVisible)
     return () => document.removeEventListener('visibilitychange', onVisible)
   }, [refreshCategories])
 
   useEffect(() => {
+    if (!selectedCategory) { setWords([]); return }
     let cancelled = false
     ;(async () => {
-      setLoading(true)
-      setError(null)
+      setWordsLoading(true)
       try {
-        await refreshCategories()
-      } catch (e) {
-        if (!cancelled) {
-          setError(e instanceof Error ? e.message : 'Failed to load data')
-        }
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [refreshCategories])
-
-  useEffect(() => {
-    if (!selectedId) {
-      setWords([])
-      return
-    }
-    let cancelled = false
-    ;(async () => {
-      try {
-        const w = await fetchWords(selectedId)
+        const w = await fetchWords(selectedCategory.id)
         if (!cancelled) setWords(w)
-      } catch {
-        if (!cancelled) setWords([])
-      }
+      } catch { if (!cancelled) setWords([]) }
+      finally { if (!cancelled) setWordsLoading(false) }
     })()
-    return () => {
-      cancelled = true
-    }
-  }, [selectedId, categories])
+    return () => { cancelled = true }
+  }, [selectedCategory])
 
-  const selectedCategory = useMemo(
-    () => categories.find((c) => c.id === selectedId) ?? null,
-    [categories, selectedId],
-  )
+  const q = search.trim().toLowerCase()
+  const filteredCategories = q ? categories.filter((c) => c.name.toLowerCase().includes(q)) : categories
+  const filteredWords = q
+    ? words.filter((w) => w.term.toLowerCase().includes(q) || w.definition.toLowerCase().includes(q))
+    : words
+
+  const openCategory = (cat: Category) => {
+    setSelectedCategory(cat)
+    setSearch('')
+    setView('term-list')
+  }
+
+  const openWord = (w: GlossaryWord) => {
+    setSelectedWord(w)
+    setView('word-detail')
+  }
+
+  const goToCategories = () => { setSelectedCategory(null); setSelectedWord(null); setSearch(''); setView('categories') }
+  const goToTermList = () => { setSelectedWord(null); setView('term-list') }
 
   if (error) {
     return (
-      <div className="app">
-        <div className="empty-main" style={{ padding: '2rem' }}>
-          <p>
-            <strong>Could not load the glossary.</strong>
-          </p>
+      <div className="home-page">
+        <div className="home-empty">
+          <p><strong>Could not load the glossary.</strong></p>
           <p className="muted">{error}</p>
-          <p className="muted">
-            Start MongoDB and the API (<code>npm run server</code>), then run{' '}
-            <code>npm run dev:full</code> or open the app after the API is up.
-          </p>
+          <p className="muted">Make sure the API server is running: <code>npm run dev:full</code></p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="app">
-      <header className="app-header">
-        <div className="brand">
-          <h1 className="home-title">Glossary</h1>
-          <p className="tagline">
-            Every category below comes from the catalog your admin manages. Select a category to
-            browse entries.
-          </p>
-        </div>
-        <div className="status-pills" aria-live="polite">
-          <span className={`pill ${online ? 'pill--ok' : 'pill--warn'}`}>
-            {online ? 'Online' : 'Offline'}
-          </span>
-          {speechSupported() ? (
-            <span className="pill pill--ok">Voice</span>
-          ) : (
-            <span className="pill pill--warn">No speech</span>
-          )}
-        </div>
-      </header>
+    <div className="home-page">
 
-      <div className="layout">
-        <aside className="sidebar">
-          <div className="sidebar-tools">
-            <button type="button" className="btn btn-ghost" onClick={handleRefresh} disabled={loading}>
-              {loading ? 'Loading…' : 'Refresh categories'}
-            </button>
+      {/* ── Search hero ── */}
+      <div className="home-hero">
+        <h1 className="home-hero__title">
+          {view === 'word-detail' && selectedWord
+            ? selectedWord.term
+            : view === 'term-list' && selectedCategory
+            ? selectedCategory.name
+            : <><span>GRAMA</span>TECH</>}
+        </h1>
+        {view !== 'word-detail' && (
+          <div className="home-search-wrap">
+            <span className="home-search-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </span>
+            <input
+              className="home-search"
+              type="search"
+              placeholder={view === 'term-list' ? `Search in ${selectedCategory?.name}…` : 'Search categories…'}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              aria-label="Search"
+            />
+            <button className="home-search-clear" onClick={() => setSearch('')} aria-label="Clear search">×</button>
           </div>
-          <nav className="category-list" aria-label="All categories from the server">
-            {loading ? (
-              <p className="muted">Loading…</p>
-            ) : categories.length === 0 ? (
-              <p className="muted">
-                No categories published yet. An admin can create them in <strong>Admin</strong> — they
-                will show up here for everyone.
-              </p>
-            ) : (
-              <ul>
-                {categories.map((c) => (
-                  <li key={c.id}>
-                    <button
-                      type="button"
-                      className={`cat-btn ${c.id === selectedId ? 'cat-btn--active' : ''}`}
-                      onClick={() => setSelectedId(c.id)}
-                    >
-                      {c.name}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </nav>
-        </aside>
+        )}
+      </div>
 
-        <main className="main">
-          {!selectedCategory ? (
-            <div className="empty-main">
-              <p>Select a category or wait for content from the server.</p>
-            </div>
-          ) : (
+      {/* ── Breadcrumb ── */}
+      {view !== 'categories' && (
+        <div className="home-breadcrumb">
+          <button className="btn-back" onClick={goToCategories}>← All Categories</button>
+          {selectedCategory && (
             <>
-              <div className="main-head">
-                <h2>{selectedCategory.name}</h2>
-                <p className="hint">
-                  Tap the term to play uploaded audio, or use speech if no audio is set.
-                </p>
-              </div>
-
-              <section className="word-list" aria-label="Words in this category">
-                {words.length === 0 ? (
-                  <p className="muted card pad">No entries in this category yet.</p>
-                ) : (
-                  <ul className="word-ul">
-                    {words.map((w) => (
-                      <li key={w.id}>
-                        <article className="word-card word-card--readonly word-card--detail">
-                          <button
-                            type="button"
-                            className="word-hit word-hit--home"
-                            onClick={() => playWordEntry(w)}
-                          >
-                            <span className="word-term">{w.term}</span>
-                            <span className="word-tap-hint">Tap → play audio / speech</span>
-                          </button>
-                          <div className="word-card__body">
-                            <WordEntryBody w={w} />
-                          </div>
-                        </article>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
+              <span className="home-breadcrumb__sep">/</span>
+              {view === 'word-detail'
+                ? <button className="btn-back" onClick={goToTermList}>{selectedCategory.name}</button>
+                : <span className="home-breadcrumb__current">{selectedCategory.name}</span>}
             </>
           )}
-        </main>
-      </div>
+          {view === 'word-detail' && selectedWord && (
+            <>
+              <span className="home-breadcrumb__sep">/</span>
+              <span className="home-breadcrumb__current">{selectedWord.term}</span>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ── View: Category grid ── */}
+      {view === 'categories' && (
+        <div className="home-content">
+          {loading ? (
+            <div className="home-empty"><div className="home-spinner" /><p className="muted">Loading…</p></div>
+          ) : filteredCategories.length === 0 ? (
+            <div className="home-empty">
+              <p className="muted">{q ? `No categories match "${search}"` : 'No categories yet.'}</p>
+            </div>
+          ) : (
+            <ul className="category-grid" aria-label="Categories">
+              {filteredCategories.map((c) => (
+                <li key={c.id}>
+                  <button className="category-card" onClick={() => openCategory(c)}>
+                    <span className="category-card__icon" aria-hidden="true">{getCategoryIcon(c.id)}</span>
+                    <span className="category-card__name">{c.name}</span>
+                    <span className="category-card__arrow" aria-hidden="true">→</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {/* ── View: Term list ── */}
+      {view === 'term-list' && (
+        <div className="home-content">
+          {wordsLoading ? (
+            <div className="home-empty"><div className="home-spinner" /><p className="muted">Loading entries…</p></div>
+          ) : filteredWords.length === 0 ? (
+            <div className="home-empty">
+              <p className="muted">{q ? `No entries match "${search}"` : 'No entries in this category yet.'}</p>
+            </div>
+          ) : (
+            <ul className="admin-term-list">
+              {filteredWords.map((w) => (
+                <li key={w.id} className="admin-term-item">
+                  <button className="admin-term-item__main" onClick={() => openWord(w)}>
+                    <span className="admin-term-item__term">{w.term}</span>
+                    {w.bahagiNgPananalita && (
+                      <span className="admin-term-item__badge">{w.bahagiNgPananalita}</span>
+                    )}
+                    <span className="admin-term-item__arrow">→</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {/* ── View: Word detail ── */}
+      {view === 'word-detail' && selectedWord && (
+        <div className="home-content">
+          <div className="card word-detail-card">
+            <WordEntryBody w={selectedWord} />
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
