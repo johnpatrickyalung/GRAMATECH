@@ -44,7 +44,21 @@ const upload = multer({
 
 // ── Express App ───────────────────────────────────────────────────────────────
 const app = express()
-app.use(cors({ origin: true, credentials: true }))
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean)
+
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+      cb(null, true)
+    } else {
+      cb(new Error(`CORS blocked: ${origin}`))
+    }
+  },
+  credentials: true,
+}))
 app.use(cookieParser())
 app.use(express.json())
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')))
@@ -138,13 +152,14 @@ app.post('/api/auth/login', async (req, res) => {
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
     await supabase.from('sessions').insert({ admin_id: admin.id, token, expires_at: expiresAt })
 
+    const isProd = process.env.NODE_ENV === 'production'
     res.cookie('token', token, {
       httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
+      sameSite: isProd ? 'none' : 'lax',
+      secure: isProd,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
-    res.json({ ok: true, username: admin.username })
+    res.json({ ok: true, username: admin.username, token })
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Server error' })

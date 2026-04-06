@@ -2,12 +2,21 @@ import type { Category, GlossaryWord, WordFormFields } from '../types'
 
 const base = (import.meta.env.VITE_API_BASE as string | undefined) ?? ''
 
+const TOKEN_KEY = 'gramatech_token'
+export const tokenStore = {
+  get: () => localStorage.getItem(TOKEN_KEY) ?? '',
+  set: (t: string) => localStorage.setItem(TOKEN_KEY, t),
+  clear: () => localStorage.removeItem(TOKEN_KEY),
+}
+
 async function jsonFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = tokenStore.get()
   const r = await fetch(`${base}${path}`, {
     ...init,
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(init?.headers ?? {}),
     },
   })
@@ -92,9 +101,11 @@ export async function createWord(
     fd.append('audio', audioFile)
   }
 
+  const token = tokenStore.get()
   const r = await fetch(`${base}/api/categories/${encodeURIComponent(categoryId)}/words`, {
     method: 'POST',
     credentials: 'include',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: fd,
   })
   const data = (await r.json().catch(() => ({}))) as Record<string, unknown> & { error?: string }
@@ -127,9 +138,10 @@ export async function updateWord(
   if (audioFile) fd.append('audio', audioFile)
   if (deleteAudio) fd.append('deleteAudio', 'true')
 
+  const token = tokenStore.get()
   const r = await fetch(
     `${base}/api/categories/${encodeURIComponent(categoryId)}/words/${encodeURIComponent(wordId)}`,
-    { method: 'PATCH', credentials: 'include', body: fd },
+    { method: 'PATCH', credentials: 'include', headers: token ? { Authorization: `Bearer ${token}` } : {}, body: fd },
   )
   const data = (await r.json().catch(() => ({}))) as Record<string, unknown> & { error?: string }
   if (!r.ok) throw new Error(typeof data.error === 'string' ? data.error : r.statusText)
@@ -157,13 +169,15 @@ export async function fetchMe(): Promise<{ user: AuthUser | null }> {
 }
 
 export async function login(username: string, password: string): Promise<LoginResponse> {
-  const data = await jsonFetch<{ ok: boolean; username: string }>('/api/auth/login', {
+  const data = await jsonFetch<{ ok: boolean; username: string; token?: string }>('/api/auth/login', {
     method: 'POST',
     body: JSON.stringify({ username, password }),
   })
-  return { ok: true, user: { username: data.username }, token: '', tokenType: 'Bearer', expiresIn: '' }
+  if (data.token) tokenStore.set(data.token)
+  return { ok: true, user: { username: data.username }, token: data.token ?? '', tokenType: 'Bearer', expiresIn: '' }
 }
 
 export async function logout(): Promise<void> {
-  await jsonFetch('/api/auth/logout', { method: 'POST' })
+  await jsonFetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
+  tokenStore.clear()
 }
