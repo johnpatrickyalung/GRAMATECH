@@ -118,6 +118,9 @@ function serializeCategory(c) {
   }
 }
 
+// ── Root ──────────────────────────────────────────────────────────────────────
+app.get('/', (_req, res) => res.json({ app: 'GRAMATECH API', status: 'ok' }))
+
 // ── Health ────────────────────────────────────────────────────────────────────
 app.get('/api/health', async (_req, res) => {
   try {
