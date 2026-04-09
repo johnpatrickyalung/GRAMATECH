@@ -31,7 +31,7 @@
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  /* gap: 0.4rem; */
 }
 
 .site-nav__brand::before {
@@ -41,6 +41,7 @@
   height: 22px;
   background: linear-gradient(135deg, #42a5f5 0%, #90caf9 100%);
   border-radius: 6px;
+  margin-right: 0.4rem;
 }
 
 .site-nav__links {

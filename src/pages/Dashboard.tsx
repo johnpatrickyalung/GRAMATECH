@@ -19,8 +19,8 @@ export default function Dashboard() {
     <>
       <div className="admin-topbar">
         <div>
-          <h1 className="admin-topbar__title">Welcome back, {user?.username} 👋</h1>
-          <p className="admin-topbar__sub">Here's an overview of your glossary</p>
+          <h1 className="admin-topbar__title">Pagbati, {user?.username} 👋</h1>
+          <p className="admin-topbar__sub">Ang glosaryong ito ay naglalaman ng mga terminolohiyang ginagamit sa pag-aaral ng gramatika sa Filipino. </p>
         </div>
       </div>
       <div className="admin-content">
