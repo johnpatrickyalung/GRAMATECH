@@ -50,7 +50,7 @@
   align-items: center;
 }
 
-/* ── Hamburger ───────────────────────────────────────────────────────────── */
+/* ── Hamburger ── */
 .site-nav__hamburger {
   display: none;
   flex-direction: column;
@@ -158,7 +158,7 @@
   font-weight: 600;
 }
 
-/* ── Shared page shell ───────────────────────────────────────────────────── */
+/* ── Shared page shell ── */
 .app {
   min-height: 100svh;
   display: flex;
@@ -166,7 +166,7 @@
   background: var(--bg);
 }
 
-/* ── Buttons ─────────────────────────────────────────────────────────────── */
+/* ── Buttons ── */
 .btn {
   font: inherit;
   font-size: 0.875rem;
@@ -219,7 +219,7 @@
   cursor: not-allowed;
 }
 
-/* ── Inputs ──────────────────────────────────────────────────────────────── */
+/* ── Inputs ── */
 .input {
   font: inherit;
   font-size: 0.9rem;
@@ -248,7 +248,7 @@
   padding: 0.45rem 0.5rem;
 }
 
-/* ── Field ───────────────────────────────────────────────────────────────── */
+/* ── Field ── */
 .field label {
   display: block;
   font-size: 0.78rem;
@@ -276,7 +276,7 @@
   grid-template-columns: 1fr !important;
 }
 
-/* ── Card ────────────────────────────────────────────────────────────────── */
+/* ── Card ── */
 .card {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -295,7 +295,7 @@
   color: var(--text-heading);
 }
 
-/* ── Status pills ────────────────────────────────────────────────────────── */
+/* ── Status pills ── */
 .status-pills { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 
 .pill {
@@ -311,7 +311,7 @@
 .pill--ok { border-color: #6ee7b7; color: var(--ok); background: #f0fdf9; }
 .pill--warn { border-color: #fcd34d; color: var(--warn); background: #fffbeb; }
 
-/* ── App header ──────────────────────────────────────────────────────────── */
+/* ── App header ── */
 .app-header {
   display: flex;
   flex-wrap: wrap;
@@ -344,7 +344,7 @@
   gap: 0.75rem;
 }
 
-/* ── Layout (admin sidebar) ──────────────────────────────────────────────── */
+/* ── Layout (admin sidebar) ── */
 .layout {
   flex: 1;
   display: grid;
@@ -370,14 +370,14 @@
 
 .sidebar-tools { margin-bottom: 0.85rem; }
 
-/* ── Form row ────────────────────────────────────────────────────────────── */
+/* ── Form row ── */
 .form-row {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
 
-/* ── Category list (admin sidebar) ──────────────────────────────────────── */
+/* ── Category list (admin sidebar) ── */
 .category-list ul {
   list-style: none;
   margin: 0;
@@ -441,7 +441,7 @@
   color: var(--danger);
 }
 
-/* ── Main content area ───────────────────────────────────────────────────── */
+/* ── Main content area ── */
 .main {
   padding: 1.5rem 1.75rem 3rem;
   min-width: 0;
@@ -474,7 +474,7 @@
   color: var(--muted);
 }
 
-/* ── Word list ───────────────────────────────────────────────────────────── */
+/* ── Word list ── */
 .word-ul {
   list-style: none;
   margin: 0;
@@ -564,7 +564,7 @@
   border-top: 1px solid var(--border);
 }
 
-/* ── Word entry body ─────────────────────────────────────────────────────── */
+/* ── Word entry body ── */
 .word-entry-body {
   display: flex;
   flex-direction: column;
@@ -601,7 +601,7 @@
   margin-top: 0.25rem;
 }
 
-/* ── Admin word form ─────────────────────────────────────────────────────── */
+/* ── Admin word form ── */
 .word-form--extended { max-width: 100%; }
 .main--admin-words .word-form--extended { margin-bottom: 1.75rem; }
 
@@ -704,7 +704,7 @@
   font-size: 0.82rem;
 }
 
-/* ── Admin login ─────────────────────────────────────────────────────────── */
+/* ── Admin login ── */
 .admin-login-wrap {
   display: flex;
   align-items: center;
@@ -748,7 +748,7 @@
   font-weight: 500;
 }
 
-/* ── Home page ───────────────────────────────────────────────────────────── */
+/* ── Home page ── */
 .home-page {
   min-height: 100svh;
   display: flex;
@@ -858,7 +858,7 @@
   color: var(--danger);
 }
 
-/* ── Breadcrumb ──────────────────────────────────────────────────────────── */
+/* ── Breadcrumb ── */
 .home-breadcrumb {
   display: flex;
   align-items: center;
@@ -891,7 +891,7 @@
   color: var(--text-heading);
 }
 
-/* ── Home content ────────────────────────────────────────────────────────── */
+/* ── Home content ── */
 .home-content {
   padding: 1.75rem;
   flex: 1;
@@ -918,7 +918,7 @@
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Category grid ───────────────────────────────────────────────────────── */
+/* ── Category grid ── */
 .category-grid {
   list-style: none;
   margin: 0;
@@ -1005,7 +1005,7 @@
   color: var(--accent);
 }
 
-/* ── Admin shell ─────────────────────────────────────────────────────────── */
+/* ── Admin shell ── */
 .admin-shell {
   display: flex;
   min-height: calc(100svh - 56px);
@@ -1019,7 +1019,7 @@
   min-height: calc(100svh - 56px);
 }
 
-/* ── Admin mobile topbar ─────────────────────────────────────────────────── */
+/* ── Admin mobile topbar ── */
 .admin-mobile-bar {
   display: none;
   align-items: center;
@@ -1054,7 +1054,7 @@
   .admin-mobile-bar { display: flex; }
 }
 
-/* ── Sidebar overlay ─────────────────────────────────────────────────────── */
+/* ── Sidebar overlay ── */
 .admin-sidebar-overlay {
   display: none;
   position: fixed;
@@ -1067,7 +1067,7 @@
   .admin-sidebar-overlay { display: block; }
 }
 
-/* ── Admin sidebar ───────────────────────────────────────────────────────── */
+/* ── Admin sidebar ── */
 .admin-sidebar {
   width: 240px;
   flex-shrink: 0;
@@ -1182,7 +1182,7 @@
 
 .admin-nav__item--active .admin-nav__icon { opacity: 1; }
 
-/* ── Sidebar footer ──────────────────────────────────────────────────────── */
+/* ── Sidebar footer ── */
 .admin-sidebar__footer {
   padding: 0.85rem 1rem;
   border-top: 1px solid var(--border);
@@ -1242,7 +1242,7 @@
   color: var(--danger);
 }
 
-/* ── Admin main ──────────────────────────────────────────────────────────── */
+/* ── Admin main ── */
 .admin-main {
   flex: 1;
   display: flex;
@@ -1290,7 +1290,7 @@
   text-align: center;
 }
 
-/* ── Category list ───────────────────────────────────────────────────────── */
+/* ── Category list ── */
 .admin-cat-list {
   list-style: none;
   margin: 0;
@@ -1370,7 +1370,7 @@
   color: var(--danger);
 }
 
-/* ── Term list ───────────────────────────────────────────────────────────── */
+/* ── Term list ── */
 .admin-term-list {
   list-style: none;
   margin: 0;
@@ -1440,7 +1440,7 @@
   color: var(--accent);
 }
 
-/* ── Word detail card ────────────────────────────────────────────────────── */
+/* ── Word detail card ── */
 .word-detail-card {
   max-width: 100%;
   margin-bottom: 1rem;
@@ -1459,7 +1459,7 @@
   color: #fff;
 }
 
-/* ── Admin form ──────────────────────────────────────────────────────────── */
+/* ── Admin form ── */
 .admin-form {
   max-width: 680px;
   margin-left: auto;
@@ -1477,7 +1477,7 @@
 
 .admin-required { color: var(--danger); }
 
-/* ── Admin login logo ────────────────────────────────────────────────────── */
+/* ── Admin login logo ── */
 .admin-login__logo {
   display: flex;
   align-items: center;
@@ -1497,7 +1497,7 @@
   background: linear-gradient(135deg, #42a5f5 0%, #90caf9 100%);
 }
 
-/* ── Nav logout button ───────────────────────────────────────────────────── */
+/* ── Nav logout button ── */
 .site-nav__logout {
   background: transparent;
   border: none;
@@ -1517,7 +1517,7 @@
   color: var(--danger);
 }
 
-/* ── Dashboard ───────────────────────────────────────────────────────────── */
+/* ── Dashboard ── */
 .dash-stats {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -1592,7 +1592,7 @@
 .dash-action-card__label { flex: 1; }
 .dash-action-card__arrow { color: var(--muted); }
 
-/* ── Category detail split layout ────────────────────────────────────────── */
+/* ── Category detail split layout ── */
 .cat-detail-layout {
   display: grid;
   grid-template-columns: 1fr;
@@ -1660,7 +1660,7 @@
   color: var(--accent);
 }
 
-/* ── Global mobile responsive ────────────────────────────────────────────── */
+/* ── Global mobile responsive ── */
 @media (max-width: 768px) {
 
   /* Admin topbar */
@@ -1736,14 +1736,14 @@
   .btn { padding: 0.45rem 0.75rem; font-size: 0.82rem; }
 }
 
-/* ── Home word detail ────────────────────────────────────────────────────── */
+/* ── Home word detail ── */
 .home-word-detail-actions {
   display: flex;
   gap: 0.75rem;
   margin-bottom: 1.25rem;
 }
 
-/* ── Misc ────────────────────────────────────────────────────────────────── */
+/* ── Misc ── */
 .sr-only {
   position: absolute;
   width: 1px; height: 1px;

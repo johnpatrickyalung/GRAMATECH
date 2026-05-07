@@ -53,7 +53,7 @@ export function WordEntryBody({ w }: Props) {
       ) : null}
       {w.halimbawaPangungusap ? (
         <p className="word-block">
-          <span className="word-label">Halimbawa sa pangungusap (Filipino, Iloko, Kapampangan)</span>
+          <span className="word-label">Halimbawa sa Filipino, Iloko at Kapampangan</span>
           <span className="word-block__text word-block__text--pre">{w.halimbawaPangungusap}</span>
         </p>
       ) : null}
